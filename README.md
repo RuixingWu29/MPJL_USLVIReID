@@ -1,19 +1,21 @@
 # MPJL_USLVIReID
 Modality-Invariant Progressive Joint Learning for Unsupervised Visible-Infrared Person Re-Identification (MPJL)
 
-## Dataset
-Put SYSU-MM01 and RegDB dataset into data/sysu and data/regdb, run prepare_sysu.py and prepare_regdb.py to convert the dataset format.
-
 ## Prerequisites
 A minimum of 72GB of GPU memory (Batchsize = 128)
 
 ## Getting Started
-git clone https://github.com/RuixingWu29/MPJL_USLVIReID.git
+Git clone https://github.com/RuixingWu29/MPJL_USLVIReID.git
 
-## install dependencies
+Download "resnet50-19c8e357.pth" from our Releases and put it into examples\pretrained
+
+## Install dependencies
 - conda create -n MPJLReID python==3.7
 - conda activate MPJLReID
 - pip install -r requirement.txt
+
+## Dataset
+Put SYSU-MM01 and RegDB dataset into data/sysu and data/regdb, run prepare_sysu.py and prepare_regdb.py to convert the dataset format.
 
 ## Training
 ```
