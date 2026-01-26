@@ -34,15 +34,12 @@ import math
 from ChannelAug import ChannelAdap, ChannelAdapGray, ChannelRandomErasing,ChannelExchange,Gray
 from collections import Counter
 start_epoch = best_mAP = 0
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 def get_data(name, data_dir,trial=0):
     root = osp.join(data_dir, name)
     dataset = datasets.create(name, root,trial=trial)
     return dataset
-
-
-
-
 
 
 def get_train_loader_ir(args, dataset, height, width, batch_size, workers,
@@ -226,9 +223,6 @@ def extract_query_feat(model, query_loader, nquery, modal):
     print('Extracting Time:\t {:.3f}'.format(time.time() - start))
     return query_feat_fc
 
-
-
-
 def pairwise_distance(features_q, features_g):
     x = torch.from_numpy(features_q)
     y = torch.from_numpy(features_g)
@@ -239,9 +233,6 @@ def pairwise_distance(features_q, features_g):
            torch.pow(y, 2).sum(dim=1, keepdim=True).expand(n, m).t()
     dist_m.addmm_(1, -2, x, y.t())
     return dist_m.numpy()
-
-
-
 
 def process_test_regdb(img_dir, trial = 1, modal = 'visible'):
     if modal=='visible':
@@ -321,13 +312,9 @@ def eval_regdb(distmat, q_pids, g_pids, max_rank = 20):
     mINP = np.mean(all_INP)
     return all_cmc, mAP, mINP
 
-
 def main_worker(args):
-    log_name='regdb_s2'#model path
-    time='20231019-094508'
-    trial = 1
     model = create_model(args)
-    trial_list=[1]
+    trial_list=[1,2,3,4,5,6,7,8,9,10]
     for trial in trial_list:  # (1,11):
         args.test_batch = 64
         args.img_w = args.width
@@ -340,11 +327,11 @@ def main_worker(args):
             T.ToTensor(),
             normalize,
         ])
-        logs_dir_root = osp.join(args.logs_dir + '/' + log_name)
-        # args.logs_dir = osp.join(logs_dir_root,str(trial))
+
         print('==> Test with the best model:')
-        path='./logs/regdb_all_aver_initial_no_inter_instance/run2/'+str(trial)+'/regdb_s1/'+str(trial)+'/'+str(trial)+'/regdb_s2/'+str(trial)
+        path = f'Path to model_best.pth.tar(trial {trial})'
         checkpoint = load_checkpoint(osp.join(path, 'model_best.pth.tar'))
+        print(path)
 
         model.load_state_dict(checkpoint['state_dict'])
 
@@ -401,11 +388,9 @@ def main_worker(args):
             T.ToTensor(),
             normalize,
         ])
-        logs_dir_root = osp.join(args.logs_dir + '/' + log_name)
-        # args.logs_dir = osp.join(logs_dir_root,str(trial))
         print('==> Test with the best model:')
         model = create_model(args)
-        path='./logs/regdb_all_aver_initial_no_inter_instance/run2/'+str(trial)+'/regdb_s1/'+str(trial)+'/'+str(trial)+'/regdb_s2/'+str(trial)
+        path = f'Path to model_best.pth.tar(trial {trial})'
         checkpoint = load_checkpoint(osp.join(path, 'model_best.pth.tar'))
 
         model.load_state_dict(checkpoint['state_dict'])
@@ -452,6 +437,8 @@ def main_worker(args):
             cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
 
 
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Self-paced contrastive learning on unsupervised re-ID")
     # data
@@ -473,8 +460,10 @@ if __name__ == '__main__':
                         help="multi-scale criterion for measuring cluster reliability")
     parser.add_argument('--k1', type=int, default=30,
                         help="hyperparameter for jaccard distance")
-    parser.add_argument('--k2', type=int, default=6,
-                        help="hyperparameter for jaccard distance")
+    parser.add_argument('--kb', type=int, default=6,
+                        help="hyperparameter for EFE (intra-modality)")
+    parser.add_argument('--kbm', type=int, default=16,
+                        help="hyperparameter for EFE (inter-modality)")
 
     # model
     parser.add_argument('-a', '--arch', type=str, default='agw',

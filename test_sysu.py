@@ -34,16 +34,15 @@ import math
 from ChannelAug import ChannelAdap, ChannelAdapGray, ChannelRandomErasing,ChannelExchange,Gray
 from collections import Counter
 from itertools import chain
+
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
+
 start_epoch = best_mAP = 0
 
 def get_data(name, data_dir):
     root = osp.join(data_dir, name)
     dataset = datasets.create(name, root)
     return dataset
-
-
-
-
 
 
 def get_test_loader(dataset, height, width, batch_size, workers, testset=None,test_transformer=None):
@@ -230,7 +229,6 @@ def extract_query_feat(model,query_loader,nquery):
     return query_feat_fc
 
 
-
 def eval_sysu(distmat, q_pids, g_pids, q_camids, g_camids, max_rank = 20):
     """Evaluation with sysu metric
     Key: for each query identity, its gallery images from the same camera view are discarded. "Following the original setting in ite dataset"
@@ -309,7 +307,6 @@ def eval_sysu(distmat, q_pids, g_pids, q_camids, g_camids, max_rank = 20):
     mAP = np.mean(all_AP)
     mINP = np.mean(all_INP)
     return new_all_cmc, mAP, mINP
-    
 
 def pairwise_distance(features_q, features_g):
     x = torch.from_numpy(features_q)
@@ -321,8 +318,6 @@ def pairwise_distance(features_q, features_g):
            torch.pow(y, 2).sum(dim=1, keepdim=True).expand(n, m).t()
     dist_m.addmm_(1, -2, x, y.t())
     return dist_m.numpy()
-
-
 
 
 class WarmupMultiStepLR(torch.optim.lr_scheduler._LRScheduler):
@@ -373,9 +368,7 @@ class WarmupMultiStepLR(torch.optim.lr_scheduler._LRScheduler):
 
 def main_worker(args):
     global start_epoch, best_mAP
-    log_name='sysu_s2'#model path
-    time_save='SYSU_ALL_average initialzation_momentum=0'
-    args.logs_dir = osp.join(args.logs_dir+'/'+time_save+'/'+log_name)
+    args.logs_dir = '/workspace/ReID/MPJL_USLVIReID/logs/2025XXXX-XXXXXX/sysu_s3'
     start_time = time.monotonic()
     cudnn.benchmark = True
 
@@ -403,7 +396,7 @@ def main_worker(args):
 #################################
     mode='all'
     print('==> Test with the best model: ',mode)
-    checkpoint = load_checkpoint(osp.join(args.logs_dir, 'checkpoint.pth.tar'))
+    checkpoint = load_checkpoint(osp.join(args.logs_dir, 'model_best.pth.tar'))
     model.load_state_dict(checkpoint['state_dict'])
     
     data_path='./data/sysu'
@@ -512,10 +505,12 @@ if __name__ == '__main__':
                         help="max neighbor distance for DBSCAN")
     parser.add_argument('--eps-gap', type=float, default=0.02,
                         help="multi-scale criterion for measuring cluster reliability")
-    parser.add_argument('--k1', type=int, default=30,
+    parser.add_argument('--k1', type=int, default=20,
                         help="hyperparameter for jaccard distance")
-    parser.add_argument('--k2', type=int, default=6,
-                        help="hyperparameter for jaccard distance")
+    parser.add_argument('--kb', type=int, default=6,
+                        help="hyperparameter for EFE (intra-modality)")
+    parser.add_argument('--kbm', type=int, default=16,
+                        help="hyperparameter for EFE (inter-modality)")
 
     # model
     parser.add_argument('-a', '--arch', type=str, default='agw',
