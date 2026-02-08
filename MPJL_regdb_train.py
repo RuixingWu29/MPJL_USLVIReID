@@ -639,7 +639,7 @@ def main_worker_stage1(args, log_s1_name, log_s2_name, subdir):
 
         if epoch >= 0:
             ##############################
-            args.test_batch = 64
+            args.test_batch = 128
             args.img_w = args.width
             args.img_h = args.height
             normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
@@ -795,7 +795,7 @@ def main_worker_stage2(args, log_s1_name, log_s2_name, subdir,subdir_update=None
     for epoch in range(30):
         if epoch == 0:
             ##############################
-            args.test_batch = 64
+            args.test_batch = 128
             args.img_w = args.width
             args.img_h = args.height
             normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
@@ -1183,7 +1183,7 @@ def main_worker_stage2(args, log_s1_name, log_s2_name, subdir,subdir_update=None
 
         if epoch >= 0:
             ##############################
-            args.test_batch = 64
+            args.test_batch = 128
             args.img_w = args.width
             args.img_h = args.height
             normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
@@ -1342,7 +1342,7 @@ def main_worker_stage3(args, log_s1_name, log_s2_name, subdir,subdir_update=None
     for epoch in range(60):
         if epoch == 0:
             ##############################
-            args.test_batch = 64
+            args.test_batch = 128
             args.img_w = args.width
             args.img_h = args.height
             normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
@@ -1818,7 +1818,7 @@ def main_worker_stage3(args, log_s1_name, log_s2_name, subdir,subdir_update=None
 
         if epoch >= 0:
             ##############################
-            args.test_batch = 64
+            args.test_batch = 128
             args.img_w = args.width
             args.img_h = args.height
             normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
