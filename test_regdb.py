@@ -25,7 +25,6 @@ from clustercontrast.utils.data import transforms as T
 from clustercontrast.utils.data.preprocessor import Preprocessor,Preprocessor_color
 from clustercontrast.utils.logging import Logger
 from clustercontrast.utils.serialization import load_checkpoint, save_checkpoint
-from clustercontrast.utils.faiss_rerank import compute_jaccard_distance
 from clustercontrast.utils.data.sampler import RandomMultipleGallerySampler, RandomMultipleGallerySamplerNoCam
 import os
 import torch.utils.data as data
